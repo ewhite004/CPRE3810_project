@@ -1,0 +1,184 @@
+-------------------------------------------------------------------------
+-- Henry Duwe
+-- Department of Electrical and Computer Engineering
+-- Iowa State University
+-------------------------------------------------------------------------
+
+
+-- RISCV_Processor.vhd
+-------------------------------------------------------------------------
+-- DESCRIPTION: This file contains a skeleton of a RISCV_Processor  
+-- implementation.
+
+-- 01/29/2019 by H3::Design created.
+-- 04/10/2025 by AP::Coverted to RISC-V.
+-- 02/19/2026 by H3::Renamed PC and handled OVFL
+-------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+library work;
+use work.RISCV_types.all;
+
+entity RISCV_Processor is
+  generic(N : integer := DATA_WIDTH);
+  port(iCLK            : in std_logic;
+       iRST            : in std_logic;
+       iInstLd         : in std_logic;
+       iInstAddr       : in std_logic_vector(N-1 downto 0);
+       iInstExt        : in std_logic_vector(N-1 downto 0);
+       oALUOut         : out std_logic_vector(N-1 downto 0)); -- TODO: Hook this up to the output of the ALU. It is important for synthesis that you have this output that can effectively be impacted by all other components so they are not optimized away.
+
+end  RISCV_Processor;
+
+
+architecture structure of RISCV_Processor is
+
+  -- Required data memory signals
+  signal s_DMemWr       : std_logic; -- TODO: use this signal as the final active high data memory write enable signal
+  signal s_DMemAddr     : std_logic_vector(N-1 downto 0); -- TODO: use this signal as the final data memory address input
+  signal s_DMemData     : std_logic_vector(N-1 downto 0); -- TODO: use this signal as the final data memory data input
+  signal s_DMemOut      : std_logic_vector(N-1 downto 0); -- TODO: use this signal as the data memory output
+ 
+  -- Required register file signals 
+  signal s_RegWr        : std_logic; -- TODO: use this signal as the final active high write enable input to the register file
+  signal s_RegWrAddr    : std_logic_vector(4 downto 0); -- TODO: use this signal as the final destination register address input
+  signal s_RegWrData    : std_logic_vector(N-1 downto 0); -- TODO: use this signal as the final data memory data input
+	--new regfile signals
+	signal s_RegRead1,s_RegRead2:std_logic_vector(N-1 downto 0); 
+
+
+  -- Required instruction memory signals
+  signal s_IMemAddr     : std_logic_vector(N-1 downto 0); -- Imem in/PC out Do not assign this signal, assign to s_PC instead
+  signal s_PC : std_logic_vector(N-1 downto 0); -- Pc in  TODO: use this signal as your intended final instruction memory address input.
+  signal s_Inst         : std_logic_vector(N-1 downto 0); --  imem out TODO: use this signal as the instruction signal 
+--new memory signals
+  signal s_PC_Increment : std_logic_vector(N-1 downto 0); -- PC+4 result of adder
+	signal s_PC_Branch_sel : std_logic:='0';
+ signal s_PC_Branch_Res: std_logic_vector(N-1 downto 0):=x"00000000"; --UNIMPLEMENTED result of adder for branching intructions
+
+
+  -- Required halt signal -- for simulation
+  signal s_Halt         : std_logic;  -- TODO: this signal indicates to the simulation that intended program execution has completed. (Use WFI with Opcode: 111 0011 func3: 000 and func12: 000100000101 -- func12 is imm field from I-format)
+
+  -- Required overflow signal -- for overflow exception detection
+  signal s_Ovfl         : std_logic;  -- this signal indicates an overflow exception would have been initiated
+
+  component mem is
+    generic(ADDR_WIDTH : integer;
+            DATA_WIDTH : integer);
+    port(
+          clk          : in std_logic;
+          addr         : in std_logic_vector((ADDR_WIDTH-1) downto 0);
+          data         : in std_logic_vector((DATA_WIDTH-1) downto 0);
+          we           : in std_logic := '1';
+          q            : out std_logic_vector((DATA_WIDTH -1) downto 0));
+    end component;
+
+
+  component Reg is
+	generic(DATA_WIDTH : integer := 32);
+	port(iCLK             : in std_logic;
+       	iD               : in std_logic_vector(DATA_WIDTH-1 downto 0);
+       	oQ               : out std_logic_vector(DATA_WIDTH-1 downto 0));
+  end component;
+
+  component adder_N is
+  generic(N : integer := 16); -- Generic of type integer for input/output data width. Default value is 32.
+  port(i_C          : in std_logic;
+       i_A         : in std_logic_vector(N-1 downto 0);
+       i_B         : in std_logic_vector(N-1 downto 0);
+       o_F          : out std_logic_vector(N-1 downto 0);
+	o_C : out std_logic
+	);
+end component;
+
+component mux2t1_N is
+  generic(N : integer := 16); -- Generic of type integer for input/output data width. Default value is 32.
+  port(i_S          : in std_logic;
+       i_D0         : in std_logic_vector(N-1 downto 0);
+       i_D1         : in std_logic_vector(N-1 downto 0);
+       o_O          : out std_logic_vector(N-1 downto 0));
+
+end component;
+
+component RegFile is
+  port(i_CLK, RST          : in std_logic;
+	i_WrEN_sel,i_sel_rs1,i_sel_rs2: in std_logic_vector(5-1 downto 0);
+	i_DATA: in std_logic_vector(32-1 downto 0);
+	o_DATA1,o_DATA2: out std_logic_vector(32-1 downto 0)
+);
+
+end component;
+
+
+  -- TODO: You may add any additional signals or components your implementation 
+  --       requires below this comment
+
+begin
+  s_Ovfl <= '0'; -- RISC-V does not have hardware overflow detection.
+  -- TODO: This is required to be your final input to your instruction memory. This provides a feasible method to externally load the memory module which means that the synthesis tool must assume it knows nothing about the values stored in the instruction memory. If this is not included, much, if not all of the design is optimized out because the synthesis tool will believe the memory to be all zeros.
+  with iInstLd select
+    s_IMemAddr <= s_PC when '0',
+      iInstAddr when others;
+
+
+  IMem: mem
+    generic map(ADDR_WIDTH => ADDR_WIDTH,
+                DATA_WIDTH => N)
+    port map(clk  => iCLK,
+             addr => s_IMemAddr(11 downto 2),
+             data => iInstExt,
+             we   => iInstLd,
+             q    => s_Inst);
+  
+  DMem: mem
+    generic map(ADDR_WIDTH => ADDR_WIDTH,
+                DATA_WIDTH => N)
+    port map(clk  => iCLK,
+             addr => s_DMemAddr(11 downto 2),
+             data => s_DMemData,
+             we   => s_DMemWr,
+             q    => s_DMemOut);
+
+  PC_reg:Reg
+	generic map(DATA_WIDTH =>N)
+	port map(iCLK => iCLK,
+       	iD   => s_PC,
+       	oQ   => s_IMemAddr);
+
+  PC_adder:adder_N--PC+4 incrementer
+    generic map(N => N) -- Generic of type integer for input/output data width. Default value is 32.
+     port map(i_C => '0',
+       i_A=> s_IMemAddr,
+       i_B=>x"00000004",
+       o_F=>s_PC_Increment
+        --o_C : out std_logic
+	);
+
+  PC_branch_mux:mux2t1_N--select between PC+4 increment and breanch result
+  generic map (N=>N) -- Generic of type integer for input/output data width. Default value is 32.
+  port map(i_S => s_PC_Branch_sel,
+       i_D0 => s_PC_Increment,
+       i_D1 => s_PC_Branch_Res,
+       o_O  => s_PC);
+
+  Registers:RegFile
+  port(i_CLK=>iCLK, 
+	RST=>iRST,
+	i_WrEN_sel=>s_Inst(11 downto 7),
+	i_sel_rs1=>s_Inst(19 downto 15),
+	i_sel_rs2=>s_Inst(24 downto 20),
+	i_DATA => s_RegWrData,
+	o_DATA1=>s_RegRead1,
+	o_DATA2 => s_RegRead1
+  );
+
+  -- TODO: Ensure that s_Halt is connected to an output control signal produced from decoding the Halt instruction (Opcode: 01 0100)
+
+  -- TODO: Implement the rest of your processor below this comment! 
+
+end structure;
+
