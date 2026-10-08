@@ -56,9 +56,14 @@ architecture structure of RISCV_Processor is
   signal s_Inst         : std_logic_vector(N-1 downto 0); --  imem out TODO: use this signal as the instruction signal 
 --new memory signals
   signal s_PC_Increment : std_logic_vector(N-1 downto 0); -- PC+4 result of adder
-	signal s_PC_Branch_sel : std_logic:='0';
+	signal s_PC_Branch_sel : std_logic;
  signal s_PC_Branch_Res: std_logic_vector(N-1 downto 0):=x"00000000"; --UNIMPLEMENTED result of adder for branching intructions
 
+--new control signals
+	signal s_imm_gen_res,s_ALU_B_in,s_ALU_out : std_logic_vector(N-1 downto 0);
+	signal s_ALU_CONTROL_IN : std_logic_vector(4-1 downto 0);
+	signal s_ALU_ZERO: std_logic;
+	signal s_control_branch_EN,s_control_memRead_EN,s_control_memToReg_sel,s_control_AluSrc_sel :std_logic;
 
   -- Required halt signal -- for simulation
   signal s_Halt         : std_logic;  -- TODO: this signal indicates to the simulation that intended program execution has completed. (Use WFI with Opcode: 111 0011 func3: 000 and func12: 000100000101 -- func12 is imm field from I-format)
@@ -110,9 +115,20 @@ component RegFile is
 	i_DATA: in std_logic_vector(32-1 downto 0);
 	o_DATA1,o_DATA2: out std_logic_vector(32-1 downto 0)
 );
-
 end component;
 
+component control is
+  port(Opcode   : in std_logic_vector(7-1 downto 0);
+	ALU_Op: out std_logic_vector(4-1 downto 0);
+       branch, MemRead, memToReg , memWrite,ALU_Src, regWrite: out std_logic
+);
+end component;
+
+component andg2 is
+  port(i_A          : in std_logic;
+       i_B          : in std_logic;
+       o_F          : out std_logic);
+end component;
 
   -- TODO: You may add any additional signals or components your implementation 
   --       requires below this comment
@@ -143,7 +159,7 @@ begin
              we   => s_DMemWr,
              q    => s_DMemOut);
 
-  PC_reg:Reg
+  PC_reg:Reg--PC register
 	generic map(DATA_WIDTH =>N)
 	port map(iCLK => iCLK,
        	iD   => s_PC,
@@ -157,6 +173,13 @@ begin
        o_F=>s_PC_Increment
         --o_C : out std_logic
 	);
+  PC_Branch_adder:adder_N--adds branch to PC instead of 4
+    generic map(N => N) -- Generic of type integer for input/output data width. Default value is 32.
+     port map(i_C => '0',
+       i_A=> s_IMemAddr,
+       i_B=>s_imm_gen_res,
+       o_F=>s_PC_Branch_Res
+	);
 
   PC_branch_mux:mux2t1_N--select between PC+4 increment and breanch result
   generic map (N=>N) -- Generic of type integer for input/output data width. Default value is 32.
@@ -165,7 +188,22 @@ begin
        i_D1 => s_PC_Branch_Res,
        o_O  => s_PC);
 
-  Registers:RegFile
+  RS2_out_mux:mux2t1_N--select between Rs2 and immidiate
+  generic map (N=>N) --
+  port map(i_S => s_control_AluSrc_sel,
+       i_D0 => s_RegRead2,
+       i_D1 => s_imm_gen_res,
+       o_O  => s_ALU_B_in);
+
+  Dmem_out_mux:mux2t1_N--select between dmem and alu result
+  generic map (N=>N) -- 
+  port map(i_S => s_control_memToReg_sel,
+       i_D0 => s_ALU_out,
+       i_D1 => s_DMemOut,
+       o_O  => s_PC);
+  
+
+  Registers:RegFile --register file
   port map(i_CLK=>iCLK, 
 	RST=>iRST,
 	i_WrEN_sel=>s_Inst(11 downto 7),
@@ -173,8 +211,25 @@ begin
 	i_sel_rs2=>s_Inst(24 downto 20),
 	i_DATA => s_RegWrData,
 	o_DATA1=>s_RegRead1,
-	o_DATA2 => s_RegRead1
+	o_DATA2 => s_RegRead2
   );
+
+  andg2_branch:andg2
+  port map(i_A=>s_control_branch_EN,
+      	i_B=>s_ALU_ZERO,
+      	o_F=>s_PC_Branch_sel
+	);
+
+  OP_control:control
+  port map(Opcode=>s_Inst(6 downto 0),
+	ALU_Op=>s_ALU_CONTROL_IN,
+      	branch=>s_control_branch_EN, 
+	MemRead=>s_control_memRead_EN, 
+	memToReg=>s_control_memToReg_sel, 
+	memWrite=>s_DMemWr,
+	ALU_Src=>s_control_AluSrc_sel, 
+	regWrite=>s_RegWr
+);
 
   -- TODO: Ensure that s_Halt is connected to an output control signal produced from decoding the Halt instruction (Opcode: 01 0100)
 
