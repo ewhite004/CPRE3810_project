@@ -124,6 +124,12 @@ component control is
 );
 end component;
 
+component imm_gen is
+  port(inst_in: in std_logic_vector(32-1 downto 0);
+	imm_out: out std_logic_vector(32-1 downto 0)
+);
+end component;
+
 component andg2 is
   port(i_A          : in std_logic;
        i_B          : in std_logic;
@@ -230,6 +236,12 @@ begin
 	ALU_Src=>s_control_AluSrc_sel, 
 	regWrite=>s_RegWr
 );
+
+immediate_generator: imm_gen
+  port map(inst_in => s_Inst,
+	imm_out=>s_imm_gen_res
+);
+
 
   -- TODO: Ensure that s_Halt is connected to an output control signal produced from decoding the Halt instruction (Opcode: 01 0100)
 

@@ -1,5 +1,5 @@
 -- Quartus Prime VHDL Template
--- Single-port RAM with single read/write address
+-- extends 20 input bits to 32-bit output, fills lower 12 bits with 0
 
 library ieee;
 use ieee.std_logic_1164.all;
