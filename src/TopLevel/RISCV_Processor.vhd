@@ -61,10 +61,10 @@ architecture structure of RISCV_Processor is
   signal s_NextPC : std_logic_vector(N-1 downto 0); -- added: input of the PC register (PC+4 or branch target)
 
 --new control signals
-	signal s_imm_gen_res,s_ALU_B_in,s_ALU_out : std_logic_vector(N-1 downto 0);
+	signal s_imm_gen_res,s_ALU_B_in,s_ALU_out,s_Logical_out : std_logic_vector(N-1 downto 0);
 	signal s_ALU_CONTROL_IN : std_logic_vector(4-1 downto 0);
 	signal s_ALU_ZERO: std_logic;
-	signal s_control_branch_EN,s_control_memRead_EN,s_control_memToReg_sel,s_control_AluSrc_sel :std_logic;
+	signal s_control_branch_EN,s_control_memRead_EN,s_control_memToReg_sel,s_control_AluSrc_sel, s_control_useImm_sel :std_logic;
 	signal s_ALU_OP : std_logic_vector(2-1 downto 0); -- added: ALUOp from control, feeds ALUControl
 
   -- Required halt signal -- for simulation
@@ -123,7 +123,7 @@ end component;
 component control is
   port(Opcode   : in std_logic_vector(7-1 downto 0);
 	ALU_Op: out std_logic_vector(2-1 downto 0); -- was: std_logic_vector(4-1 downto 0) -- FIXED: ALUControl takes a 2-bit ALUOp
-       branch, MemRead, memToReg , memWrite,ALU_Src, regWrite: out std_logic
+       branch, MemRead, memToReg , memWrite,ALU_Src, regWrite, useImm: out std_logic
 );
 end component;
 
@@ -253,7 +253,7 @@ begin
   port map(i_S => s_control_memToReg_sel,
        i_D0 => s_ALU_out,
        i_D1 => s_DMemOut,
-       o_O  => s_RegWrData); -- was: o_O  => s_PC); -- FIXED: this mux produces the register write data
+       o_O  => s_Logical_out); -- was: o_O  => s_PC); -- FIXED: this mux produces the register write data
   
 
   Registers:RegFile --register file
@@ -282,13 +282,21 @@ begin
 	memToReg=>s_control_memToReg_sel, 
 	memWrite=>s_DMemWr,
 	ALU_Src=>s_control_AluSrc_sel, 
-	regWrite=>s_RegWr
+	regWrite=>s_RegWr,
+	useImm=>s_control_useImm_sel
 );
 
 immediate_generator: imm_gen
   port map(inst_in => s_Inst,
 	imm_out=>s_imm_gen_res
 );
+
+use_imm_mux:mux2t1_N--select between Rs2 and immidiate
+  generic map (N=>N) --
+  port map(i_S => s_control_useImm_sel,
+       i_D0 => s_Logical_out,
+       i_D1 => s_imm_gen_res,
+       o_O  => s_RegWrData);
 
 
   -- TODO: Ensure that s_Halt is connected to an output control signal produced from decoding the Halt instruction (Opcode: 01 0100)

@@ -1,6 +1,6 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
-
+--TODO commend on ALUop and ALUcontrol bit meanings
 entity ALUControl is
   port(
     i_ALUOp       : in std_logic_vector(1 downto 0);
@@ -38,6 +38,7 @@ begin
       "0001" when "110",   -- ORI
       "0000" when "111",   -- ANDI
       "0110" when others;
+      
 
   -- Main ALUOp selection
   with i_ALUOp select

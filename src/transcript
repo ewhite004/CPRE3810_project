@@ -13,20 +13,7 @@
 # // and may not be used in any way not expressly authorized by SISW.
 # //
 add wave -position insertpoint  \
-vsim:/riscv_processor/s_RegWrData \
-vsim:/riscv_processor/s_PC_Increment \
-vsim:/riscv_processor/s_PC_Branch_sel \
-vsim:/riscv_processor/s_PC_Branch_Res \
-vsim:/riscv_processor/s_PC \
-vsim:/riscv_processor/s_Inst \
-vsim:/riscv_processor/s_imm_gen_res \
-vsim:/riscv_processor/s_IMemAddr \
-vsim:/riscv_processor/s_control_branch_EN \
-vsim:/riscv_processor/s_ALU_ZERO \
-vsim:/riscv_processor/oALUOut \
-vsim:/riscv_processor/N \
-vsim:/riscv_processor/iRST \
-vsim:/riscv_processor/iInstLd \
-vsim:/riscv_processor/iInstExt \
-vsim:/riscv_processor/iInstAddr \
-vsim:/riscv_processor/iCLK
+vsim:/tb/reset_done \
+vsim:/tb/reset \
+vsim:/tb/CLK \
+vsim:/tb/alu_out
