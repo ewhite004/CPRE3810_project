@@ -1,10 +1,10 @@
-
 library IEEE;
 use IEEE.std_logic_1164.all;
 use work.RISCV_types.all;
 
 entity RegFile is
   port(i_CLK, RST          : in std_logic;
+	i_RegWr                 : in std_logic; -- added: FIXED: regfile had no write enable, so every instruction (even sw) wrote a register
 	i_WrEN_sel,i_sel_rs1,i_sel_rs2: in std_logic_vector(5-1 downto 0);
 	i_DATA: in std_logic_vector(32-1 downto 0);
 	o_DATA1,o_DATA2: out std_logic_vector(32-1 downto 0)
@@ -41,10 +41,12 @@ component dffg_N is
 end component;
 
 signal rd_wire:std_logic_vector(32-1 downto 0);
+signal s_we   :std_logic_vector(32-1 downto 0); -- added: decoder output gated with i_RegWr
 signal reg_rs: vector_32x32;
 --signal s_B_inv,s_mux_r :std_logic_vector(N-1 downto 0);
 begin
 
+s_we <= rd_wire and (rd_wire'range => i_RegWr); -- added: only write when RegWrite is asserted
 
 dffg_N0: dffg_N 
 	generic map(N=>32)
@@ -60,7 +62,7 @@ G_NBYTE_DFFG_N: for i in 1 to 32-1 generate
 	port map(
 	i_CLK =>i_CLK,
        	i_RST => RST,
-       	i_WE => rd_Wire(i),
+       	i_WE => s_we(i), -- was: i_WE => rd_Wire(i), -- FIXED: gated with RegWrite (x0 above is held in reset so it is unchanged)
        	i_D  => i_DATA,
        	o_Q  => reg_rs(i)	);
 end generate G_NBYTE_DFFG_N;

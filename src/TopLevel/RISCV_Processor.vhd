@@ -58,12 +58,14 @@ architecture structure of RISCV_Processor is
   signal s_PC_Increment : std_logic_vector(N-1 downto 0); -- PC+4 result of adder
 	signal s_PC_Branch_sel : std_logic;
  signal s_PC_Branch_Res: std_logic_vector(N-1 downto 0):=x"00000000"; --UNIMPLEMENTED result of adder for branching intructions
+  signal s_NextPC : std_logic_vector(N-1 downto 0); -- added: input of the PC register (PC+4 or branch target)
 
 --new control signals
 	signal s_imm_gen_res,s_ALU_B_in,s_ALU_out : std_logic_vector(N-1 downto 0);
 	signal s_ALU_CONTROL_IN : std_logic_vector(4-1 downto 0);
 	signal s_ALU_ZERO: std_logic;
 	signal s_control_branch_EN,s_control_memRead_EN,s_control_memToReg_sel,s_control_AluSrc_sel :std_logic;
+	signal s_ALU_OP : std_logic_vector(2-1 downto 0); -- added: ALUOp from control, feeds ALUControl
 
   -- Required halt signal -- for simulation
   signal s_Halt         : std_logic;  -- TODO: this signal indicates to the simulation that intended program execution has completed. (Use WFI with Opcode: 111 0011 func3: 000 and func12: 000100000101 -- func12 is imm field from I-format)
@@ -111,6 +113,7 @@ end component;
 
 component RegFile is
   port(i_CLK, RST          : in std_logic;
+	i_RegWr                 : in std_logic; -- added: FIXED: regfile had no write enable
 	i_WrEN_sel,i_sel_rs1,i_sel_rs2: in std_logic_vector(5-1 downto 0);
 	i_DATA: in std_logic_vector(32-1 downto 0);
 	o_DATA1,o_DATA2: out std_logic_vector(32-1 downto 0)
@@ -119,7 +122,7 @@ end component;
 
 component control is
   port(Opcode   : in std_logic_vector(7-1 downto 0);
-	ALU_Op: out std_logic_vector(4-1 downto 0);
+	ALU_Op: out std_logic_vector(2-1 downto 0); -- was: std_logic_vector(4-1 downto 0) -- FIXED: ALUControl takes a 2-bit ALUOp
        branch, MemRead, memToReg , memWrite,ALU_Src, regWrite: out std_logic
 );
 end component;
@@ -135,6 +138,42 @@ component andg2 is
        i_B          : in std_logic;
        o_F          : out std_logic);
 end component;
+
+  -- added components
+  component dffg_N is
+    generic(
+      N : integer := 32
+    );
+    port(
+      i_CLK : in std_logic;
+      i_RST : in std_logic;
+      i_WE  : in std_logic;
+      i_D   : in std_logic_vector(N-1 downto 0);
+      o_Q   : out std_logic_vector(N-1 downto 0)
+    );
+  end component;
+
+  component ALUControl is
+    port(
+      i_ALUOp      : in std_logic_vector(1 downto 0);
+      i_Funct3     : in std_logic_vector(2 downto 0);
+      i_Funct7Bit  : in std_logic;
+      o_ALUControl : out std_logic_vector(3 downto 0)
+    );
+  end component;
+
+  component ALU is
+    generic(
+      N : integer := 32
+    );
+    port(
+      i_A          : in std_logic_vector(N-1 downto 0);
+      i_B          : in std_logic_vector(N-1 downto 0);
+      i_ALUControl : in std_logic_vector(3 downto 0);
+      o_Result     : out std_logic_vector(N-1 downto 0);
+      o_Zero       : out std_logic
+    );
+  end component;
 
   -- TODO: You may add any additional signals or components your implementation 
   --       requires below this comment
@@ -165,16 +204,24 @@ begin
              we   => s_DMemWr,
              q    => s_DMemOut);
 
-  PC_reg:Reg--PC register
-	generic map(DATA_WIDTH =>N)
-	port map(iCLK => iCLK,
-       	iD   => s_PC,
-       	oQ   => s_IMemAddr);
+  -- FIXED: the PC register had no reset (PC stayed 'U'), took s_PC as its input and drove s_IMemAddr (a second driver). It was:
+  --PC_reg:Reg--PC register
+  --	generic map(DATA_WIDTH =>N)
+  --	port map(iCLK => iCLK,
+  --       \tiD   => s_PC,
+  --       \toQ   => s_IMemAddr);
+  PC_reg:dffg_N--PC register (resets to 0)
+	generic map(N =>N)
+	port map(i_CLK => iCLK,
+       	i_RST => iRST,
+       	i_WE  => '1',
+       	i_D   => s_NextPC,
+       	o_Q   => s_PC);
 
   PC_adder:adder_N--PC+4 incrementer
     generic map(N => N) -- Generic of type integer for input/output data width. Default value is 32.
      port map(i_C => '0',
-       i_A=> s_IMemAddr,
+       i_A=> s_PC, -- was: i_A=> s_IMemAddr, -- FIXED: use the PC itself (s_IMemAddr is the iInstLd mux output)
        i_B=>x"00000004",
        o_F=>s_PC_Increment
         --o_C : out std_logic
@@ -182,7 +229,7 @@ begin
   PC_Branch_adder:adder_N--adds branch to PC instead of 4
     generic map(N => N) -- Generic of type integer for input/output data width. Default value is 32.
      port map(i_C => '0',
-       i_A=> s_IMemAddr,
+       i_A=> s_PC, -- was: i_A=> s_IMemAddr, -- FIXED: use the PC itself
        i_B=>s_imm_gen_res,
        o_F=>s_PC_Branch_Res
 	);
@@ -192,7 +239,7 @@ begin
   port map(i_S => s_PC_Branch_sel,
        i_D0 => s_PC_Increment,
        i_D1 => s_PC_Branch_Res,
-       o_O  => s_PC);
+       o_O  => s_NextPC); -- was: o_O  => s_PC); -- FIXED: mux output is the next PC, s_PC is the PC register output
 
   RS2_out_mux:mux2t1_N--select between Rs2 and immidiate
   generic map (N=>N) --
@@ -206,13 +253,14 @@ begin
   port map(i_S => s_control_memToReg_sel,
        i_D0 => s_ALU_out,
        i_D1 => s_DMemOut,
-       o_O  => s_PC);
+       o_O  => s_RegWrData); -- was: o_O  => s_PC); -- FIXED: this mux produces the register write data
   
 
   Registers:RegFile --register file
   port map(i_CLK=>iCLK, 
 	RST=>iRST,
-	i_WrEN_sel=>s_Inst(11 downto 7),
+	i_RegWr=>s_RegWr, -- added: FIXED: regfile had no write enable
+	i_WrEN_sel=>s_RegWrAddr, -- was: i_WrEN_sel=>s_Inst(11 downto 7), -- FIXED: use the required s_RegWrAddr signal (assigned below)
 	i_sel_rs1=>s_Inst(19 downto 15),
 	i_sel_rs2=>s_Inst(24 downto 20),
 	i_DATA => s_RegWrData,
@@ -228,7 +276,7 @@ begin
 
   OP_control:control
   port map(Opcode=>s_Inst(6 downto 0),
-	ALU_Op=>s_ALU_CONTROL_IN,
+	ALU_Op=>s_ALU_OP, -- was: ALU_Op=>s_ALU_CONTROL_IN, -- FIXED: goes through ALUControl, which produces s_ALU_CONTROL_IN
       	branch=>s_control_branch_EN, 
 	MemRead=>s_control_memRead_EN, 
 	memToReg=>s_control_memToReg_sel, 
@@ -247,5 +295,27 @@ immediate_generator: imm_gen
 
   -- TODO: Implement the rest of your processor below this comment! 
 
-end structure;
+  ALU_Control_Unit: ALUControl
+  port map(i_ALUOp=>s_ALU_OP,
+	i_Funct3=>s_Inst(14 downto 12),
+	i_Funct7Bit=>s_Inst(30),
+	o_ALUControl=>s_ALU_CONTROL_IN
+  );
 
+  Main_ALU: ALU
+  generic map(N => N)
+  port map(i_A=>s_RegRead1,
+	i_B=>s_ALU_B_in,
+	i_ALUControl=>s_ALU_CONTROL_IN,
+	o_Result=>s_ALU_out,
+	o_Zero=>s_ALU_ZERO
+  );
+
+  -- connections for the required skeleton signals
+  s_RegWrAddr <= s_Inst(11 downto 7);
+  s_DMemAddr  <= s_ALU_out;
+  s_DMemData  <= s_RegRead2;
+  oALUOut     <= s_ALU_out;
+  s_Halt      <= '1' when s_Inst = x"10500073" else '0'; -- wfi
+
+end structure;
