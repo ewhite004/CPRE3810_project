@@ -54,18 +54,27 @@ architecture structure of RISCV_Processor is
   signal s_IMemAddr     : std_logic_vector(N-1 downto 0); -- Imem in/PC out Do not assign this signal, assign to s_PC instead
   signal s_PC : std_logic_vector(N-1 downto 0); -- Pc in  TODO: use this signal as your intended final instruction memory address input.
   signal s_Inst         : std_logic_vector(N-1 downto 0); --  imem out TODO: use this signal as the instruction signal 
---new memory signals
+  --new memory signals
   signal s_PC_Increment : std_logic_vector(N-1 downto 0); -- PC+4 result of adder
-	signal s_PC_Branch_sel : std_logic;
- signal s_PC_Branch_Res: std_logic_vector(N-1 downto 0):=x"00000000"; --UNIMPLEMENTED result of adder for branching intructions
-  signal s_NextPC : std_logic_vector(N-1 downto 0); -- added: input of the PC register (PC+4 or branch target)
+  signal s_PC_Branch_sel : std_logic;
+  signal s_PC_Branch_Res: std_logic_vector(N-1 downto 0):=x"00000000"; --UNIMPLEMENTED result of adder for branching intructions
+  signal s_NextPC : std_logic_vector(N-1 downto 0); -- input of the PC register (PC+4 or branch target)
 
---new control signals
-	signal s_imm_gen_res,s_ALU_B_in,s_ALU_out,s_Logical_out : std_logic_vector(N-1 downto 0);
-	signal s_ALU_CONTROL_IN : std_logic_vector(4-1 downto 0);
-	signal s_ALU_ZERO: std_logic;
-	signal s_control_branch_EN,s_control_memRead_EN,s_control_memToReg_sel,s_control_AluSrc_sel, s_control_useImm_sel :std_logic;
-	signal s_ALU_OP : std_logic_vector(2-1 downto 0); -- added: ALUOp from control, feeds ALUControl
+  --new control signals
+  signal s_imm_gen_res,s_ALU_B_in,s_ALU_out,s_Logical_out : std_logic_vector(N-1 downto 0);
+  signal s_ALU_CONTROL_IN : std_logic_vector(4-1 downto 0);
+  signal s_ALU_ZERO: std_logic;
+  signal s_control_branch_EN,s_control_memRead_EN,s_control_memToReg_sel,s_control_AluSrc_sel, s_control_useImm_sel :std_logic;
+  signal s_ALU_OP : std_logic_vector(2-1 downto 0); -- ALUOp from control, feeds ALUControl
+  signal s_control_auipc, s_control_jal, s_control_jalr : std_logic; -- auipc / jump instruction flags from control
+  signal s_branch_taken : std_logic; -- Branch AND condition, before the OR with jal
+  signal s_branch_inv, s_branch_cond : std_logic; -- branch condition logic (see branch_cond below)
+  signal s_NextPC_pre : std_logic_vector(N-1 downto 0); -- PC+4 / branch / jal target, before the jalr mux
+  signal s_JalrTarget : std_logic_vector(N-1 downto 0); -- (rs1 + imm) with bit 0 cleared
+  signal s_LoadData : std_logic_vector(N-1 downto 0); -- data memory output after byte/half select and extension
+  signal s_Link : std_logic; -- jal or jalr, so rd gets PC+4
+  signal s_WB_link, s_WB_auipc : std_logic_vector(N-1 downto 0); -- write back data after the link mux / after the auipc mux (feeds the useImm mux)
+  signal s_PC_q, s_PC_d : std_logic_vector(N-1 downto 0); -- PC register output / input (bit 22 is stored inverted, see PC_bit22 below)
 
   -- Required halt signal -- for simulation
   signal s_Halt         : std_logic;  -- TODO: this signal indicates to the simulation that intended program execution has completed. (Use WFI with Opcode: 111 0011 func3: 000 and func12: 000100000101 -- func12 is imm field from I-format)
@@ -122,6 +131,7 @@ end component;
 
 component control is
   port(Opcode   : in std_logic_vector(7-1 downto 0);
+	auipc, jal, jalr: out std_logic; -- auipc / jump instruction flags
 	ALU_Op: out std_logic_vector(2-1 downto 0); -- was: std_logic_vector(4-1 downto 0) -- FIXED: ALUControl takes a 2-bit ALUOp
        branch, MemRead, memToReg , memWrite,ALU_Src, regWrite, useImm: out std_logic
 );
@@ -140,6 +150,38 @@ component andg2 is
 end component;
 
   -- added components
+  component invg is
+    port(
+      i_A : in std_logic;
+      o_F : out std_logic
+    );
+  end component;
+
+  component org2 is
+    port(
+      i_A : in std_logic;
+      i_B : in std_logic;
+      o_F : out std_logic
+    );
+  end component;
+
+  component xorg2 is
+    port(
+      i_A : in std_logic;
+      i_B : in std_logic;
+      o_F : out std_logic
+    );
+  end component;
+
+  component load_ext is
+    port(
+      i_Data   : in std_logic_vector(32-1 downto 0);
+      i_Addr   : in std_logic_vector(2-1 downto 0);
+      i_Funct3 : in std_logic_vector(3-1 downto 0);
+      o_Data   : out std_logic_vector(32-1 downto 0)
+    );
+  end component;
+
   component dffg_N is
     generic(
       N : integer := 32
@@ -215,8 +257,8 @@ begin
 	port map(i_CLK => iCLK,
        	i_RST => iRST,
        	i_WE  => '1',
-       	i_D   => s_NextPC,
-       	o_Q   => s_PC);
+       	i_D   => s_PC_d, -- was: i_D   => s_NextPC, -- changed: goes through the bit 22 inverter below so the PC resets to 0x00400000
+       	o_Q   => s_PC_q); -- was: o_Q   => s_PC); -- changed: s_PC is built from s_PC_q below
 
   PC_adder:adder_N--PC+4 incrementer
     generic map(N => N) -- Generic of type integer for input/output data width. Default value is 32.
@@ -226,7 +268,7 @@ begin
        o_F=>s_PC_Increment
         --o_C : out std_logic
 	);
-  PC_Branch_adder:adder_N--adds branch to PC instead of 4
+  PC_Branch_adder:adder_N -- adds branch to PC instead of 4
     generic map(N => N) -- Generic of type integer for input/output data width. Default value is 32.
      port map(i_C => '0',
        i_A=> s_PC, -- was: i_A=> s_IMemAddr, -- FIXED: use the PC itself
@@ -234,15 +276,15 @@ begin
        o_F=>s_PC_Branch_Res
 	);
 
-  PC_branch_mux:mux2t1_N--select between PC+4 increment and breanch result
+  PC_branch_mux:mux2t1_N  -- select between PC+4 increment and breanch result
   generic map (N=>N) -- Generic of type integer for input/output data width. Default value is 32.
   port map(i_S => s_PC_Branch_sel,
        i_D0 => s_PC_Increment,
        i_D1 => s_PC_Branch_Res,
-       o_O  => s_NextPC); -- was: o_O  => s_PC); -- FIXED: mux output is the next PC, s_PC is the PC register output
+       o_O  => s_NextPC_pre); -- was: o_O  => s_NextPC); -- changed: the jalr mux below produces s_NextPC (earlier: was o_O => s_PC -- FIXED: mux output is the next PC, s_PC is the PC register output)
 
   RS2_out_mux:mux2t1_N--select between Rs2 and immidiate
-  generic map (N=>N) --
+  generic map (N=>N) 
   port map(i_S => s_control_AluSrc_sel,
        i_D0 => s_RegRead2,
        i_D1 => s_imm_gen_res,
@@ -252,7 +294,7 @@ begin
   generic map (N=>N) -- 
   port map(i_S => s_control_memToReg_sel,
        i_D0 => s_ALU_out,
-       i_D1 => s_DMemOut,
+       i_D1 => s_LoadData, -- was: i_D1 => s_DMemOut, -- changed: byte/half select and extension (load_ext) for lb, lh, lbu, lhu
        o_O  => s_Logical_out); -- was: o_O  => s_PC); -- FIXED: this mux produces the register write data
   
 
@@ -270,12 +312,15 @@ begin
 
   andg2_branch:andg2
   port map(i_A=>s_control_branch_EN,
-      	i_B=>s_ALU_ZERO,
-      	o_F=>s_PC_Branch_sel
+      	i_B=>s_branch_cond, -- was: i_B=>s_ALU_ZERO, -- changed: Zero is combined with funct3 so bne, blt, bge, bltu and bgeu work (see branch_cond below)
+      	o_F=>s_branch_taken -- was: o_F=>s_PC_Branch_sel -- changed: OR with jal follows (jump_or below)
 	);
 
   OP_control:control
   port map(Opcode=>s_Inst(6 downto 0),
+	auipc=>s_control_auipc, 
+	jal=>s_control_jal,
+	jalr=>s_control_jalr,
 	ALU_Op=>s_ALU_OP, -- was: ALU_Op=>s_ALU_CONTROL_IN, -- FIXED: goes through ALUControl, which produces s_ALU_CONTROL_IN
       	branch=>s_control_branch_EN, 
 	MemRead=>s_control_memRead_EN, 
@@ -294,7 +339,7 @@ immediate_generator: imm_gen
 use_imm_mux:mux2t1_N--select between Rs2 and immidiate
   generic map (N=>N) --
   port map(i_S => s_control_useImm_sel,
-       i_D0 => s_Logical_out,
+       i_D0 => s_WB_auipc, -- was: i_D0 => s_Logical_out, -- changed: link (jal/jalr) and auipc muxes follow the ALU/load mux
        i_D1 => s_imm_gen_res,
        o_O  => s_RegWrData);
 
@@ -318,6 +363,77 @@ use_imm_mux:mux2t1_N--select between Rs2 and immidiate
 	o_Result=>s_ALU_out,
 	o_Zero=>s_ALU_ZERO
   );
+
+  -- the PC resets to 0x00400000 (where RARS starts the program; auipc/jal/jalr write PC based values).
+  -- dffg_N resets to all zeros, so bit 22 of the PC is stored inverted (it resets to 0, which reads as 1).
+  s_PC(N-1 downto 23) <= s_PC_q(N-1 downto 23);
+  s_PC(21 downto 0)   <= s_PC_q(21 downto 0);
+  PC_bit22_out:invg
+  port map(i_A => s_PC_q(22),
+       o_F => s_PC(22));
+
+  s_PC_d(N-1 downto 23) <= s_NextPC(N-1 downto 23);
+  s_PC_d(21 downto 0)   <= s_NextPC(21 downto 0);
+  PC_bit22_in:invg
+  port map(i_A => s_NextPC(22),
+       o_F => s_PC_d(22));
+
+  -- branch condition, the ALU compares rs1 and rs2 (sub for beq/bne, slt for blt/bge, sltu for bltu/bgeu).
+  -- beq, bge and bgeu are taken when Zero = 1; bne, blt and bltu are taken when Zero = 0.
+  -- funct3(2) XOR funct3(0) is 1 for bne, blt and bltu, which flips Zero.
+  branch_inv:xorg2
+  port map(i_A => s_Inst(14),
+       i_B => s_Inst(12),
+       o_F => s_branch_inv);
+
+  branch_cond:xorg2
+  port map(i_A => s_ALU_ZERO,
+       i_B => s_branch_inv,
+       o_F => s_branch_cond);
+
+  -- jal always takes the PC + imm path, so it is ORed with the branch taken signal
+  jump_or:org2
+  port map(i_A => s_branch_taken,
+       i_B => s_control_jal,
+       o_F => s_PC_Branch_sel);
+
+  -- jalr target is (rs1 + imm) with bit 0 cleared, used instead of the PC+4 / branch / jal target
+  s_JalrTarget <= s_ALU_out(N-1 downto 1) & '0';
+
+  jalr_mux:mux2t1_N  -- select between PC+4/branch/jal and the jalr target
+  generic map (N=>N)
+  port map(i_S => s_control_jalr,
+       i_D0 => s_NextPC_pre,
+       i_D1 => s_JalrTarget,
+       o_O  => s_NextPC);
+
+  -- select the addressed byte/halfword of the loaded word and extend it (lb, lh, lbu, lhu; lw passes through)
+  Load_unit:load_ext
+  port map(i_Data   => s_DMemOut,
+       i_Addr   => s_DMemAddr(1 downto 0),
+       i_Funct3 => s_Inst(14 downto 12),
+       o_Data   => s_LoadData);
+
+  -- jal and jalr write PC+4 (the return address) to rd instead of the ALU / load result
+  link_or:org2
+  port map(i_A => s_control_jal,
+       i_B => s_control_jalr,
+       o_F => s_Link);
+
+  Link_mux:mux2t1_N -- select between ALU/load result and PC+4
+  generic map (N=>N)
+  port map(i_S => s_Link,
+       i_D0 => s_Logical_out,
+       i_D1 => s_PC_Increment,
+       o_O  => s_WB_link);
+
+  -- auipc writes PC + imm, which the PC branch adder already computes (s_PC_Branch_Res)
+  Auipc_mux:mux2t1_N  -- select between the previous write back data and PC + imm
+  generic map (N=>N)
+  port map(i_S => s_control_auipc,
+       i_D0 => s_WB_link,
+       i_D1 => s_PC_Branch_Res,
+       o_O  => s_WB_auipc);
 
   -- connections for the required skeleton signals
   s_RegWrAddr <= s_Inst(11 downto 7);
