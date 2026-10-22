@@ -89,6 +89,7 @@ architecture structure of RISCV_Processor is
           clk          : in std_logic;
           addr         : in std_logic_vector((ADDR_WIDTH-1) downto 0);
           data         : in std_logic_vector((DATA_WIDTH-1) downto 0);
+          be           : in std_logic_vector (3 downto 0);   -- 4 bytes per word
           we           : in std_logic := '1';
           q            : out std_logic_vector((DATA_WIDTH -1) downto 0));
     end component;
@@ -234,6 +235,7 @@ begin
     port map(clk  => iCLK,
              addr => s_IMemAddr(11 downto 2),
              data => iInstExt,
+             be => "1111",--hardcoded, stays
              we   => iInstLd,
              q    => s_Inst);
   
@@ -243,6 +245,7 @@ begin
     port map(clk  => iCLK,
              addr => s_DMemAddr(11 downto 2),
              data => s_DMemData,
+             be => "1111",--hardcoded, TODO:change for sb,sh
              we   => s_DMemWr,
              q    => s_DMemOut);
 
