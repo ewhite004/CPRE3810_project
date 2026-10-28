@@ -32,7 +32,7 @@ begin
 	i_C =>i_C,
 	o_C => C(1)
 );
-  G_NBit_ADDER: for i in 1 to N-1 generate
+  G_NBit_ADDER: for i in 1 to N-2 generate -- was: for i in 1 to N-1 generate -- FIXED: bit N-1 is built by adderlast below, it was being driven twice
     ADDERI: adder1 port map(
               i_A      => i_A(i),      -- All instances share the same select input.
               i_B     => i_B(i),  -- ith instance's data 0 input hooked up to ith data 0 input.
