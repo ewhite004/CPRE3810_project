@@ -1,8 +1,10 @@
 m255
 K4
 z2
-!s12c _opt1
+!s12c _opt2
 Z0 !s99 nomlopt
+!s12c _opt1
+R0
 !s12c _opt
 R0
 !s11e vcom 2026.2 2026.05, May 18 2026
@@ -49,6 +51,23 @@ R7
 n@_opt1
 R8
 R1
+T_opt2
+!i145 1
+!i144 0
+!s110 1793209949
+VKSMF[ha_SX<^d>NfXT>1@3
+04 10 5 work control_tb mixed 1
+=1-7486e228ae04-6ae2365d-9016c-1f1b
+R0
+R2
+R3
+R4
+R5
+!i152 0
+o-quiet -auto_acc_if_foreign -work work +acc
+R7
+n@_opt2
+R8
 Eadd_sub_n
 Z9 w1788212452
 Z10 DPx3 std 6 textio 0 22 <UlP6K1@RDQa_MJ[:UEnP2
@@ -214,22 +233,22 @@ R40
 R19
 R20
 Econtrol
-Z42 w1791468644
+Z42 w1792674700
 R10
 R11
-!i122 32
+!i122 51
 R1
 Z43 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/control.vhd
 Z44 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/control.vhd
 l0
-L5 1
-VVI_]_^:mm[ME9=WQZ`ziG1
-!s100 dT>0O_=>4G_CC43_JRIKU2
+L4 1
+V3_gJXO5T7:T;CmYUJ=[<:2
+!s100 ZL44ZMSKj5UKYO>YM=P>23
 R14
 32
-Z45 !s110 1791468711
+Z45 !s110 1793209934
 !i10b 1
-Z46 !s108 1791468711.000000
+Z46 !s108 1793209934.000000
 Z47 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/control.vhd|
 Z48 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/control.vhd|
 !i113 0
@@ -238,12 +257,12 @@ R20
 Adataflow
 R10
 R11
-DEx4 work 7 control 0 22 VI_]_^:mm[ME9=WQZ`ziG1
-!i122 32
+DEx4 work 7 control 0 22 3_gJXO5T7:T;CmYUJ=[<:2
+!i122 51
 l17
-L13 33
-V55cf4B7Q=3z]icb<^iWBD2
-!s100 DECS?UPKFX8g^0mII37mC2
+L13 64
+VEV4L^jkk3XdPgOHMOYLL13
+!s100 0B?Sn>KN_19kga4D3n0^32
 R14
 32
 R45
@@ -254,25 +273,68 @@ R48
 !i113 0
 R19
 R20
+Econtrol_tb
+Z49 w1793209854
+Z50 DPx4 ieee 11 numeric_std 0 22 m=kP7jRZW]kY;6MU;0z<22
+R10
+R11
+!i122 52
+R1
+Z51 8/home/ebwhite/LabsCPRE381/Project/proj/src/tb/control_tb.vhd
+Z52 F/home/ebwhite/LabsCPRE381/Project/proj/src/tb/control_tb.vhd
+l0
+L5 1
+Vc>cFI^[ClO2JNiX@h9djc1
+!s100 AT>:4XEdJ17[Ii:z2Gde[3
+R14
+32
+Z53 !s110 1793209942
+!i10b 1
+Z54 !s108 1793209942.000000
+Z55 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/tb/control_tb.vhd|
+Z56 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/tb/control_tb.vhd|
+!i113 0
+R19
+R20
+Amixed
+R50
+R10
+R11
+DEx4 work 10 control_tb 0 22 c>cFI^[ClO2JNiX@h9djc1
+!i122 52
+l22
+L8 70
+VFJMlSeO2CVB0:Xnkj:S]f1
+!s100 `JLHCODi]CX]]9j^f]:Ai1
+R14
+32
+R53
+!i10b 1
+R54
+R55
+R56
+!i113 0
+R19
+R20
 Edecoder_5t32
-Z49 w1789051410
+Z57 w1789051410
 R10
 R11
 !i122 9
 R1
-Z50 8/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/decoder_5t32.vhd
-Z51 F/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/decoder_5t32.vhd
+Z58 8/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/decoder_5t32.vhd
+Z59 F/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/decoder_5t32.vhd
 l0
 L4 1
 VKa^]kDUAe2?;gHg@ko?HD0
 !s100 V4>1I90?DhSZPg0F28^CE0
 R14
 32
-Z52 !s110 1791468512
+Z60 !s110 1791468512
 !i10b 1
-Z53 !s108 1791468512.000000
-Z54 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/decoder_5t32.vhd|
-Z55 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/decoder_5t32.vhd|
+Z61 !s108 1791468512.000000
+Z62 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/decoder_5t32.vhd|
+Z63 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/decoder_5t32.vhd|
 !i113 0
 R19
 R20
@@ -287,33 +349,33 @@ VO6Cfzd:0Ra[>on=OKgZY=0
 !s100 lN<OcGn8=@EaP>Qona[[g3
 R14
 32
-R52
+R60
 !i10b 1
-R53
-R54
-R55
+R61
+R62
+R63
 !i113 0
 R19
 R20
 Edffg
-Z56 w1788311240
+Z64 w1788311240
 R10
 R11
 !i122 10
 R1
-Z57 8/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg.vhd
-Z58 F/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg.vhd
+Z65 8/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg.vhd
+Z66 F/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg.vhd
 l0
 R36
 V<]b9Vm3e`GAN;Cnj:57L>2
 !s100 T4gcXQGMCgKJbn8XhBM;b0
 R14
 32
-R52
+R60
 !i10b 1
-R53
-Z59 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg.vhd|
-Z60 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg.vhd|
+R61
+Z67 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg.vhd|
+Z68 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg.vhd|
 !i113 0
 R19
 R20
@@ -328,33 +390,33 @@ V`CHXPZKVEek`3gFWL_zFm2
 !s100 iOdlTUid@@]UimFK_53^C1
 R14
 32
-R52
-!i10b 1
-R53
-R59
 R60
+!i10b 1
+R61
+R67
+R68
 !i113 0
 R19
 R20
 Edffg_n
-Z61 w1789048103
+Z69 w1789048103
 R10
 R11
 !i122 11
 R1
-Z62 8/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg_N.vhd
-Z63 F/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg_N.vhd
+Z70 8/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg_N.vhd
+Z71 F/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg_N.vhd
 l0
 L4 1
 VlEhUSVRnKT7?LeHJiZnz:1
 !s100 @__oi1nRcY5zWIiEDDnlk1
 R14
 32
-R52
+R60
 !i10b 1
-R53
-Z64 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg_N.vhd|
-Z65 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg_N.vhd|
+R61
+Z72 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg_N.vhd|
+Z73 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/dffg_N.vhd|
 !i113 0
 R19
 R20
@@ -369,65 +431,65 @@ VhWI4NTgTLESFGJn2WVQY:0
 !s100 7]dKKgK9f:YV3:VdzgX510
 R14
 32
-R52
+R60
 !i10b 1
-R53
-R64
-R65
+R61
+R72
+R73
 !i113 0
 R19
 R20
 Eextender
-Z66 w1789862270
-Z67 DPx4 ieee 11 numeric_std 0 22 m=kP7jRZW]kY;6MU;0z<22
+Z74 w1789862270
+R50
 R10
 R11
 !i122 34
 R1
-Z68 8/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/extender.vhd
-Z69 F/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/extender.vhd
+Z75 8/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/extender.vhd
+Z76 F/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/extender.vhd
 l0
 L8 1
 VVIMcEOCPG_N0_J1YL;TD40
 !s100 GB>UOGFdDOZ_A;T_zO5ze0
 R14
 32
-Z70 !s110 1791947650
+Z77 !s110 1791947650
 !i10b 1
-Z71 !s108 1791947650.000000
-Z72 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/extender.vhd|
-!s107 /home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/extender.vhd|
+Z78 !s108 1791947650.000000
+Z79 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/extender.vhd|
+Z80 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/extender.vhd|
 !i113 0
 R19
 R20
 Adataflow
-R67
+R50
 R10
 R11
-Z73 DEx4 work 8 extender 0 22 VIMcEOCPG_N0_J1YL;TD40
+DEx4 work 8 extender 0 22 VIMcEOCPG_N0_J1YL;TD40
 !i122 34
 l20
-Z74 L19 6
-Z75 VX=_ZQ@E=;>jleV?]WFg4k0
-Z76 !s100 bA4ZB]NBlCHczj@1h3[0k1
+L19 6
+VX=_ZQ@E=;>jleV?]WFg4k0
+!s100 bA4ZB]NBlCHczj@1h3[0k1
 R14
 32
-R70
+R77
 !i10b 1
-R71
-R72
-Z77 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/extender.vhd|
+R78
+R79
+R80
 !i113 0
 R19
 R20
 Einvg
-Z78 w1737080926
+Z81 w1737080926
 R10
 R11
 !i122 6
 R1
-Z79 8/home/ebwhite/LabsCPRE381/Project/proj/src/gates/invg.vhd
-Z80 F/home/ebwhite/LabsCPRE381/Project/proj/src/gates/invg.vhd
+Z82 8/home/ebwhite/LabsCPRE381/Project/proj/src/gates/invg.vhd
+Z83 F/home/ebwhite/LabsCPRE381/Project/proj/src/gates/invg.vhd
 l0
 R36
 VQ?6hb9ePk@>kZZ9k]hNSO3
@@ -437,8 +499,8 @@ R14
 R37
 !i10b 1
 R38
-Z81 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/gates/invg.vhd|
-Z82 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/gates/invg.vhd|
+Z84 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/gates/invg.vhd|
+Z85 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/gates/invg.vhd|
 !i113 0
 R19
 R20
@@ -456,20 +518,20 @@ R14
 R37
 !i10b 1
 R38
-R81
-R82
+R84
+R85
 !i113 0
 R19
 R20
 Emem
-Z83 w1790861050
-R67
+Z86 w1790861050
+R50
 R10
 R11
 !i122 26
 R1
-Z84 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mem.vhd
-Z85 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mem.vhd
+Z87 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mem.vhd
+Z88 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mem.vhd
 l0
 L8 1
 VA@bQN;jW:QePcl[[Y:WFe0
@@ -479,13 +541,13 @@ R14
 R29
 !i10b 1
 R30
-Z86 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mem.vhd|
-Z87 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mem.vhd|
+Z89 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mem.vhd|
+Z90 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mem.vhd|
 !i113 0
 R19
 R20
 Artl
-R67
+R50
 R10
 R11
 DEx4 work 3 mem 0 22 A@bQN;jW:QePcl[[Y:WFe0
@@ -499,30 +561,30 @@ R14
 R29
 !i10b 1
 R30
-R86
-R87
+R89
+R90
 !i113 0
 R19
 R20
 Emux2t1
-Z88 w1788196034
+Z91 w1788196034
 R10
 R11
 !i122 12
 R1
-Z89 8/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/mux2t1.vhd
-Z90 F/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/mux2t1.vhd
+Z92 8/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/mux2t1.vhd
+Z93 F/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/mux2t1.vhd
 l0
 L4 1
 V_DHL^Dc75LUL`@5<U96?F0
 !s100 ii<IRbI=H9[i3Xg`Z>[D_2
 R14
 32
-R52
+R60
 !i10b 1
-R53
-Z91 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/mux2t1.vhd|
-Z92 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/mux2t1.vhd|
+R61
+Z94 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/mux2t1.vhd|
+Z95 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/standardCells/mux2t1.vhd|
 !i113 0
 R19
 R20
@@ -537,22 +599,22 @@ VNOEln9`U9c4k>EPZZUMom1
 !s100 <;^HCGaz_4G>j_i9EoB>A3
 R14
 32
-R52
+R60
 !i10b 1
-R53
-R91
-R92
+R61
+R94
+R95
 !i113 0
 R19
 R20
 Emux2t1_n
-Z93 w1706115834
+Z96 w1706115834
 R10
 R11
 !i122 27
 R1
-Z94 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux2t1_N.vhd
-Z95 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux2t1_N.vhd
+Z97 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux2t1_N.vhd
+Z98 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux2t1_N.vhd
 l0
 L21 1
 VVXi7X3UiclkB06DNQaZ]K0
@@ -562,8 +624,8 @@ R14
 R29
 !i10b 1
 R30
-Z96 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux2t1_N.vhd|
-Z97 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux2t1_N.vhd|
+Z99 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux2t1_N.vhd|
+Z100 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux2t1_N.vhd|
 !i113 0
 R19
 R20
@@ -581,21 +643,21 @@ R14
 R29
 !i10b 1
 R30
-R96
-R97
+R99
+R100
 !i113 0
 R19
 R20
 Emux32_32t1
-Z98 w1790863091
-Z99 DPx4 work 11 riscv_types 0 22 cIEfMi9d_j2I2e:cYUI6e0
-R67
+Z101 w1790863091
+Z102 DPx4 work 11 riscv_types 0 22 cIEfMi9d_j2I2e:cYUI6e0
+R50
 R10
 R11
 !i122 28
 R1
-Z100 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux32_32t1.vhd
-Z101 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux32_32t1.vhd
+Z103 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux32_32t1.vhd
+Z104 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux32_32t1.vhd
 l0
 L6 1
 V>CGi7^TN6i4=l=B?2R2LW3
@@ -605,14 +667,14 @@ R14
 R29
 !i10b 1
 R30
-Z102 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux32_32t1.vhd|
-Z103 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux32_32t1.vhd|
+Z105 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux32_32t1.vhd|
+Z106 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/mux32_32t1.vhd|
 !i113 0
 R19
 R20
 Adataflow
-R99
-R67
+R102
+R50
 R10
 R11
 DEx4 work 10 mux32_32t1 0 22 >CGi7^TN6i4=l=B?2R2LW3
@@ -626,30 +688,30 @@ R14
 R29
 !i10b 1
 R30
-R102
-R103
+R105
+R106
 !i113 0
 R19
 R20
 Eonescomp
-Z104 w1788200947
+Z107 w1788200947
 R10
 R11
 !i122 23
 R1
-Z105 8/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/onesComp.vhd
-Z106 F/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/onesComp.vhd
+Z108 8/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/onesComp.vhd
+Z109 F/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/onesComp.vhd
 l0
 L4 1
 Vd=RDcFn^RNKknNoAzbT8I3
 !s100 ]OGzbj1en=fPSmaILGD>O0
 R14
 32
-Z107 !s110 1791468650
+Z110 !s110 1791468650
 !i10b 1
-Z108 !s108 1791468650.000000
-Z109 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/onesComp.vhd|
-Z110 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/onesComp.vhd|
+Z111 !s108 1791468650.000000
+Z112 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/onesComp.vhd|
+Z113 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/subcomponent/onesComp.vhd|
 !i113 0
 R19
 R20
@@ -664,22 +726,22 @@ Ve`B1FeZho1D6M@hoNcmfd0
 !s100 LEfFEJGnUZ_0zXhTWf?HC1
 R14
 32
-R107
-!i10b 1
-R108
-R109
 R110
+!i10b 1
+R111
+R112
+R113
 !i113 0
 R19
 R20
 Eorg2
-R93
+R96
 R10
 R11
 !i122 7
 R1
-Z111 8/home/ebwhite/LabsCPRE381/Project/proj/src/gates/org2.vhd
-Z112 F/home/ebwhite/LabsCPRE381/Project/proj/src/gates/org2.vhd
+Z114 8/home/ebwhite/LabsCPRE381/Project/proj/src/gates/org2.vhd
+Z115 F/home/ebwhite/LabsCPRE381/Project/proj/src/gates/org2.vhd
 l0
 R36
 V[C`FCj=kL0CTBYLlbjJzD3
@@ -689,8 +751,8 @@ R14
 R37
 !i10b 1
 R38
-Z113 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/gates/org2.vhd|
-Z114 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/gates/org2.vhd|
+Z116 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/gates/org2.vhd|
+Z117 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/gates/org2.vhd|
 !i113 0
 R19
 R20
@@ -708,19 +770,19 @@ R14
 R37
 !i10b 1
 R38
-R113
-R114
+R116
+R117
 !i113 0
 R19
 R20
 Ereg
-Z115 w1737081307
+Z118 w1737081307
 R10
 R11
 !i122 29
 R1
-Z116 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/Reg.vhd
-Z117 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/Reg.vhd
+Z119 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/Reg.vhd
+Z120 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/Reg.vhd
 l0
 R36
 VXhAm11gig^BY4C[:nGSJ>1
@@ -730,8 +792,8 @@ R14
 R29
 !i10b 1
 R30
-Z118 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/Reg.vhd|
-Z119 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/Reg.vhd|
+Z121 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/Reg.vhd|
+Z122 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/Reg.vhd|
 !i113 0
 R19
 R20
@@ -749,20 +811,20 @@ R14
 R29
 !i10b 1
 R30
-R118
-R119
+R121
+R122
 !i113 0
 R19
 R20
 Eregfile
-Z120 w1790863110
-R99
+Z123 w1790863110
+R102
 R10
 R11
 !i122 30
 R1
-Z121 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RegFile.vhd
-Z122 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RegFile.vhd
+Z124 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RegFile.vhd
+Z125 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RegFile.vhd
 l0
 L6 1
 Vl0g;QgdkHzbQgUOioLXL21
@@ -772,13 +834,13 @@ R14
 R29
 !i10b 1
 R30
-Z123 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RegFile.vhd|
-Z124 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RegFile.vhd|
+Z126 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RegFile.vhd|
+Z127 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RegFile.vhd|
 !i113 0
 R19
 R20
 Astructural
-R99
+R102
 R10
 R11
 DEx4 work 7 regfile 0 22 l0g;QgdkHzbQgUOioLXL21
@@ -792,20 +854,20 @@ R14
 R29
 !i10b 1
 R30
-R123
-R124
+R126
+R127
 !i113 0
 R19
 R20
 Eriscv_processor
-Z125 w1791468158
-R99
+Z128 w1791468158
+R102
 R10
 R11
 !i122 31
 R1
-Z126 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RISCV_Processor.vhd
-Z127 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RISCV_Processor.vhd
+Z129 8/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RISCV_Processor.vhd
+Z130 F/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RISCV_Processor.vhd
 l0
 L25 1
 VckXVm1hD60Wb:^0:OA;M^1
@@ -815,13 +877,13 @@ R14
 R29
 !i10b 1
 R30
-Z128 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RISCV_Processor.vhd|
-Z129 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RISCV_Processor.vhd|
+Z131 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RISCV_Processor.vhd|
+Z132 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/TopLevel/RISCV_Processor.vhd|
 !i113 0
 R19
 R20
 Astructure
-R99
+R102
 R10
 R11
 DEx4 work 15 riscv_processor 0 22 ckXVm1hD60Wb:^0:OA;M^1
@@ -835,8 +897,8 @@ R14
 R29
 !i10b 1
 R30
-R128
-R129
+R131
+R132
 !i113 0
 R19
 R20
@@ -844,26 +906,26 @@ Priscv_types
 R10
 R11
 !i122 33
-Z130 w1790861795
+Z133 w1790861795
 R1
-Z131 8/home/ebwhite/LabsCPRE381/Project/proj/src/RISCV_types.vhd
-Z132 F/home/ebwhite/LabsCPRE381/Project/proj/src/RISCV_types.vhd
+Z134 8/home/ebwhite/LabsCPRE381/Project/proj/src/RISCV_types.vhd
+Z135 F/home/ebwhite/LabsCPRE381/Project/proj/src/RISCV_types.vhd
 l0
 L15 14
 VcIEfMi9d_j2I2e:cYUI6e0
 !s100 :Yf[R<ak;=a7K]N?_2AA42
 R14
 32
-Z133 !s110 1791941940
+Z136 !s110 1791941940
 !i10b 1
-Z134 !s108 1791941940.000000
-Z135 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/RISCV_types.vhd|
-Z136 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/RISCV_types.vhd|
+Z137 !s108 1791941940.000000
+Z138 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/RISCV_types.vhd|
+Z139 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/RISCV_types.vhd|
 !i113 0
 R19
 R20
 Bbody
-R99
+R102
 R10
 R11
 !i122 33
@@ -873,22 +935,22 @@ VS6T3fSQ>keBP32Zn5HPUX1
 !s100 6l2]jU6RLnD1mI5j_Nh4=1
 R14
 32
-R133
-!i10b 1
-R134
-R135
 R136
+!i10b 1
+R137
+R138
+R139
 !i113 0
 R19
 R20
 Exorg2
-R93
+R96
 R10
 R11
 !i122 8
 R1
-Z137 8/home/ebwhite/LabsCPRE381/Project/proj/src/gates/xorg2.vhd
-Z138 F/home/ebwhite/LabsCPRE381/Project/proj/src/gates/xorg2.vhd
+Z140 8/home/ebwhite/LabsCPRE381/Project/proj/src/gates/xorg2.vhd
+Z141 F/home/ebwhite/LabsCPRE381/Project/proj/src/gates/xorg2.vhd
 l0
 R36
 V;hb`C0MKik;h36`3`SzM60
@@ -898,8 +960,8 @@ R14
 R37
 !i10b 1
 R38
-Z139 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/gates/xorg2.vhd|
-Z140 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/gates/xorg2.vhd|
+Z142 !s90 -reportprogress|300|-work|work|/home/ebwhite/LabsCPRE381/Project/proj/src/gates/xorg2.vhd|
+Z143 !s107 /home/ebwhite/LabsCPRE381/Project/proj/src/gates/xorg2.vhd|
 !i113 0
 R19
 R20
@@ -917,8 +979,8 @@ R14
 R37
 !i10b 1
 R38
-R139
-R140
+R142
+R143
 !i113 0
 R19
 R20

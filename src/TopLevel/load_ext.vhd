@@ -46,9 +46,9 @@ begin
 
   with i_Funct3 select
     o_Data <=
-      s_ByteSign & s_Byte  when "000",  -- lb
-      s_HalfSign & s_Half  when "001",  -- lh
-      i_Data               when "010",  -- lw
+      s_ByteSign & s_Byte  when "000",  -- lb, sb
+      s_HalfSign & s_Half  when "001",  -- lh, sh
+      i_Data               when "010",  -- lw, sw
       x"000000" & s_Byte   when "100",  -- lbu
       x"0000" & s_Half     when "101",  -- lhu
       i_Data               when others;

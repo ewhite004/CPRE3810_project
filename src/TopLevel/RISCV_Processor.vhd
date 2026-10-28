@@ -59,6 +59,7 @@ architecture structure of RISCV_Processor is
   signal s_PC_Branch_sel : std_logic;
   signal s_PC_Branch_Res: std_logic_vector(N-1 downto 0):=x"00000000"; --UNIMPLEMENTED result of adder for branching intructions
   signal s_NextPC : std_logic_vector(N-1 downto 0); -- input of the PC register (PC+4 or branch target)
+  signal s_DMEM_BE :std_logic_vector(4-1 downto 0);
 
   --new control signals
   signal s_imm_gen_res,s_ALU_B_in,s_ALU_out,s_Logical_out : std_logic_vector(N-1 downto 0);
@@ -217,6 +218,14 @@ end component;
       o_Zero       : out std_logic
     );
   end component;
+  
+  component store_ext is
+  port(
+    i_Addr   : in std_logic_vector(2-1 downto 0);   -- low 2 bits of the byte address
+    i_Funct3 : in std_logic_vector(3-1 downto 0);   -- load type (instruction bits 14:12)
+    o_BE   : out std_logic_vector(4-1 downto 0)  -- be of DMEM
+  );
+end component;
 
   -- TODO: You may add any additional signals or components your implementation 
   --       requires below this comment
@@ -245,7 +254,7 @@ begin
     port map(clk  => iCLK,
              addr => s_DMemAddr(11 downto 2),
              data => s_DMemData,
-             be => "1111",--hardcoded, TODO:change for sb,sh
+             be => s_DMEM_BE,
              we   => s_DMemWr,
              q    => s_DMemOut);
 
@@ -437,6 +446,14 @@ use_imm_mux:mux2t1_N--select between Rs2 and immidiate
        i_D0 => s_WB_link,
        i_D1 => s_PC_Branch_Res,
        o_O  => s_WB_auipc);
+       
+       --set BE of DMEM for s* commands
+    store_set:store_ext
+    port map(
+    i_Addr  => s_DMemAddr(1 downto 0),   -- low 2 bits of the byte address
+    i_Funct3 =>s_Inst(14 downto 12),  -- load type (instruction bits 14:12)
+    o_BE   =>s_DMEM_BE  -- be of DMEM
+  );
 
   -- connections for the required skeleton signals
   s_RegWrAddr <= s_Inst(11 downto 7);

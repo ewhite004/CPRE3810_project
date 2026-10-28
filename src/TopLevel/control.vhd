@@ -5,6 +5,7 @@ entity control is
   port(Opcode   : in std_logic_vector(7-1 downto 0);
        auipc, jal, jalr : out std_logic; -- auipc writes PC+imm to rd; jal/jalr are jumps (next PC and rd = PC+4 handled in the processor)
        ALU_Op   : out std_logic_vector(2-1 downto 0); -- ALUControl takes a 2-bit ALUOp
+       dMem_be : out std_logic_vector(4-1 downto 0);
        branch, MemRead, memToReg, memWrite, ALU_Src, regWrite, useImm : out std_logic
   );
 
